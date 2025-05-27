@@ -1,37 +1,31 @@
-
-import tensorflow as tf
+from tensorflow.keras.models import load_model
+from tensorflow.keras.applications.mobilenet_v2 import preprocess_input
+from PIL import Image
 import numpy as np
-from tensorflow.keras.preprocessing import image
-import json
 
+# Load model
+model = load_model('mushroom_classifier.h5')
 
-# Config
-model_path = "mushroom_classifier.h5"
-label_map_path = "label_map.json"
-img_height, img_width = 150, 150
+# Define class names in English (order must match the training folder order)
+class_names = ['Agaricus', 'Amanita', 'Boletus', 'Cortinarius',
+               'Entoloma', 'Hygrocybe', 'Lactarius', 'Russula', 'Suillus']
 
-# Load model and labels
-model = tf.keras.models.load_model(model_path)
+# Load and preprocess image
+image_path = r'lactarius.jpg'
+img = Image.open(image_path).convert('RGB')
+img = img.resize((224, 224))
+img_array = np.array(img)
+img_array = preprocess_input(img_array)
+img_array = np.expand_dims(img_array, axis=0)
 
-with open(label_map_path, 'r') as f:
-    label_map = json.load(f)
+# Predict
+predictions = model.predict(img_array)[0]
 
+# Top 5 predictions
+top_indices = predictions.argsort()[-5:][::-1]
+top_classes = [(class_names[i], predictions[i]) for i in top_indices]
 
-def predict_image(img_path):
-    img = image.load_img(img_path, target_size=(img_height, img_width))
-    img_array = image.img_to_array(img) / 255.
-    img_array = np.expand_dims(img_array, axis=0)
-    prediction = model.predict(img_array)[0]  # single prediction
-    class_index = np.argmax(prediction)
-    class_label = label_map[str(class_index)]
-    confidence = float(prediction[class_index])
-
-    print(f"Predicted class: {class_label}, Confidence: {confidence:.4f}")
-
-    return class_label, confidence
-
-
-# Example usage
-if __name__ == "__main__":
-    test_img = r"C:\projects\scripts\agaricus.jpg"
-    predict_image(test_img)
+# Print
+print("Top 5 predicted classes with confidence:")
+for cls, score in top_classes:
+    print(f"{cls}: {score:.4f}")
