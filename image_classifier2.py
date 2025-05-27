@@ -100,7 +100,8 @@ EPOCHS = 15
 model.fit(train_ds, validation_data=val_ds, epochs=EPOCHS)
 
 # Save model
-model.save(f'mushroom_classifier2 EPOCHS:{EPOCHS}.h5')
+name = f'mushroom_classifier2_EPOCHS_{EPOCHS}.h5'
+model.save(name)
 print("Model saved as mushroom_classifier.h5")
 
 # Predict and show examples correctly (no preprocessing on displayed images)

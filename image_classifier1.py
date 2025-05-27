@@ -89,7 +89,8 @@ EPOCHS = 10
 model.fit(train_ds, validation_data=val_ds, epochs=EPOCHS)
 
 # Save model
-model.save(f'mushroom_classifier1 EPOCHS:{EPOCHS}.h5')
+name = f'mushroom_classifier1_EPOCHS_{EPOCHS}.h5'
+model.save(name)
 print("Model saved as mushroom_classifier.h5")
 val_ds_unprocessed = image_dataset_from_directory(
     DATA_DIR,
