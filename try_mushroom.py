@@ -4,14 +4,14 @@ from PIL import Image
 import numpy as np
 
 # Load model
-model = load_model('mushroom_classifier1_EPOCHS_10.h5')
+model = load_model('mushroom_classifier_25epochs.h5')
 
 # Define class names in English (order must match the training folder order)
 class_names = ['Agaricus', 'Amanita', 'Boletus', 'Cortinarius',
                'Entoloma', 'Hygrocybe', 'Lactarius', 'Russula', 'Suillus']
 
 # Load and preprocess image
-image_path = r'entoloma.jpg'
+image_path = r'suillus.jpg'
 img = Image.open(image_path).convert('RGB')
 img = img.resize((224, 224))
 img_array = np.array(img)
