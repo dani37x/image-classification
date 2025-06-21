@@ -1,3 +1,5 @@
+import sys
+import json
 from tensorflow.keras.models import load_model
 from tensorflow.keras.applications.mobilenet_v2 import preprocess_input
 from PIL import Image
@@ -22,19 +24,25 @@ class MushroomPredictor:
         img_array = preprocess_input(img_array)
         return np.expand_dims(img_array, axis=0)
 
-    def predict(self, image_path: str, top_k: int = 5) -> List[tuple[str, float]]:
+    def predict(self, image_path: str, top_k: int = 5) -> List[dict]:
         img_array = self.preprocess_image(image_path)
         predictions = self.model.predict(img_array)[0]
         top_indices = predictions.argsort()[-top_k:][::-1]
-        return [(self.class_names[i], predictions[i]) for i in top_indices]
-
-    def print_top_predictions(self, image_path: str, top_k: int = 5):
-        top_classes = self.predict(image_path, top_k)
-        print("Top predicted classes with confidence:")
-        for cls, score in top_classes:
-            print(f"{cls}: {score:.4f}")
+        return [
+            {"class": self.class_names[i],
+                "confidence": float(predictions[i]) * 100}
+            for i in top_indices
+        ]
 
 
 if __name__ == "__main__":
-    predictor = MushroomPredictor('models\\mushroom_classifier_v3_EPOCHS_1.h5')
-    predictor.print_top_predictions('test_images\\suillus.jpg')
+    if len(sys.argv) < 3:
+        print(json.dumps(
+            {"error": "Missing arguments. Usage: python try_mushroom.py <model_path> <image_path>"}))
+        sys.exit(1)
+
+    model_path = sys.argv[1]
+    image_path = sys.argv[2]
+    predictor = MushroomPredictor(model_path)
+    results = predictor.predict(image_path)
+    print(json.dumps(results))

@@ -1,0 +1,3 @@
+pyinstaller --onefile --noconsole try_mushroom.py  - Creates .exe
+
+

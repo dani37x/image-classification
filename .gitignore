@@ -1,2 +1,5 @@
 Mushrooms/*
 *.h5
+build/*
+dist/*
+*.spec
